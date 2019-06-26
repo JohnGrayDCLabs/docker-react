@@ -1,0 +1,27 @@
+version: "3"
+services:
+  web:
+    build:
+      # Map the build command to look in the current working directory.
+      context: .
+      # File name of the dockerfile which is found in the context directory set above.
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      # Do not map the node_modules folder as it is generated during npm install command.
+      - /app/node_modules
+      # Map the current working directory to the app folder inside the container.
+      - .:/app
+  # Specify a second service just to run the test suite.
+  tests:
+    # Specify the same build directory and dockerfile as the web service, as it should run on the same container.
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    # Specify same volumes as this should be an identical deployment of the web service.
+    volumes:
+      - /app/node_modules
+      - .:/app
+    # Override the default command which is run when the container starts with npm run test to start the test suite.
+    command: ["npm", "run", "test"]
